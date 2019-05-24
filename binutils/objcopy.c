@@ -2457,7 +2457,8 @@ merge_gnu_build_notes (bfd * abfd, asection * sec, bfd_size_type size, bfd_byte 
    Returns TRUE upon success, FALSE otherwise.  */
 
 static bfd_boolean
-copy_object (bfd *ibfd, bfd *obfd, const bfd_arch_info_type *input_arch)
+copy_object (bfd *ibfd, bfd *obfd,
+             __attribute__((unused))const bfd_arch_info_type *input_arch)
 {
   bfd_vma start;
   long symcount;
@@ -2468,8 +2469,6 @@ copy_object (bfd *ibfd, bfd *obfd, const bfd_arch_info_type *input_arch)
   bfd_size_type max_gap = 0;
   long symsize;
   void *dhandle;
-  enum bfd_architecture iarch;
-  unsigned int imach;
   unsigned int c, i;
 
   if (ibfd->xvec->byteorder != obfd->xvec->byteorder
@@ -2549,35 +2548,6 @@ copy_object (bfd *ibfd, bfd *obfd, const bfd_arch_info_type *input_arch)
 	  bfd_nonfatal_message (NULL, ibfd, NULL, NULL);
 	  return FALSE;
 	}
-    }
-
-  /* Copy architecture of input file to output file.  */
-  iarch = bfd_get_arch (ibfd);
-  imach = bfd_get_mach (ibfd);
-  if (input_arch)
-    {
-      if (bfd_get_arch_info (ibfd) == NULL
-	  || bfd_get_arch_info (ibfd)->arch == bfd_arch_unknown)
-	{
-	  iarch = input_arch->arch;
-	  imach = input_arch->mach;
-	}
-      else
-	non_fatal (_("Input file `%s' ignores binary architecture parameter."),
-		   bfd_get_archive_filename (ibfd));
-    }
-  if (!bfd_set_arch_mach (obfd, iarch, imach)
-      && (ibfd->target_defaulted
-	  || bfd_get_arch (ibfd) != bfd_get_arch (obfd)))
-    {
-      if (bfd_get_arch (ibfd) == bfd_arch_unknown)
-	non_fatal (_("Unable to recognise the format of the input file `%s'"),
-		   bfd_get_archive_filename (ibfd));
-      else
-	non_fatal (_("Output file cannot represent architecture `%s'"),
-		   bfd_printable_arch_mach (bfd_get_arch (ibfd),
-					    bfd_get_mach (ibfd)));
-      return FALSE;
     }
 
   if (!bfd_set_format (obfd, bfd_get_format (ibfd)))
